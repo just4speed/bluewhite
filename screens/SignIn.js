@@ -1,6 +1,7 @@
 import React from 'react';
 import { SafeAreaView, View, TouchableOpacity, StyleSheet } from "react-native";
 import { Input, Text, Button } from 'react-native-elements';
+import { useDispatch } from 'react-redux';
 import {
     widthPercentageToDP as wp, heightPercentageToDP as hp
 } from "react-native-responsive-screen";
@@ -11,6 +12,7 @@ const SignIn = ({ navigation }) => {
         password: ""
     });
     const [errors, setErrors] = React.useState([]);
+    const dispatch = useDispatch();
 
     const onChangeValue = ( key, value ) => {
         setValues({
@@ -31,6 +33,13 @@ const SignIn = ({ navigation }) => {
         }
         if(formErrors.length === 0){
             setErrors([]);
+            dispatch({
+                type: "LOGIN",
+                payload: {
+                    mobile: "+78312384921"
+                }
+            });
+            navigation.navigate("ParkMe");
         } else {
             setErrors(formErrors);
         }
@@ -68,7 +77,6 @@ const SignIn = ({ navigation }) => {
             <Button
                 onPress={onSignIn}
                 title="Sign In"
-                icon={{ type: 'font-awesome', name: 'arrow-right', color: "#fff" }}
             />
             <View style={styles.newAccount}>
                 <Text>or </Text>

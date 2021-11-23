@@ -47,6 +47,13 @@ const SignUp = () => {
         }
         if(formErrors.length === 0){
             setErrors([]);
+            dispatch({
+                type: "LOGIN",
+                payload: {
+                    mobile: "+78312384921"
+                }
+            });
+            navigation.navigate("ParkMe");
         } else {
             setErrors(formErrors);
         }
