@@ -14,21 +14,33 @@ import Submit from "./screens/Submit";
 // Redux
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import store from "./redux/store.js";
+// Utils
+import deviceStorage from './utils/storage';
 
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 
 const Drawer = createDrawerNavigator();
 
-const LogOut = ({ navigation }) => {
+const CustomDrawerContent = props => {
+  const user = useSelector(state => state.user);
+  const navigation = useNavigation();
   const dispatch = useDispatch();
-  React.useEffect(() => {
+
+  const logOut = () => {
+    deviceStorage.signout();
     dispatch({ type: "LOG_OUT" });
     navigation.navigate("Login");
-  });
-  return(
-    <View></View>
-  )
+  }
+
+  return (
+    <DrawerContentScrollView {...props}>
+      <DrawerItemList {...props} />
+      { user.isAuthorized && (
+        <DrawerItem label="Log Out" onPress={logOut} />
+      ) }
+    </DrawerContentScrollView>
+  );
 }
 
 const hideOptions = {
@@ -40,10 +52,30 @@ const hideOptions = {
 
 function DrawerNavigator() {
   const user = useSelector(state => state.user);
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    deviceStorage.init()
+    .then((data, token) => {
+      dispatch({
+        type: "LOGIN",
+        payload: {
+          user: data,
+          token
+        }
+      });
+    }).catch(e => {
+      console.warn("noob")
+    })
+  }, []);
+
   return (
     <View style={styles.container}>
       <NavigationContainer>
-        <Drawer.Navigator initialRouteName={user.isAuthorized ? "ParkMe" : "Login"}>
+        <Drawer.Navigator
+          initialRouteName={user.isAuthorized ? "ParkMe" : "Login"}
+          drawerContent={props => <CustomDrawerContent {...props} />}
+        >
 
           <Drawer.Screen
             name="Login"
@@ -78,12 +110,6 @@ function DrawerNavigator() {
           <Drawer.Screen
             name="Submit"
             component={Submit}
-            options={!user.isAuthorized && hideOptions}
-          />
-
-          <Drawer.Screen
-            name="Log out"
-            component={LogOut}
             options={!user.isAuthorized && hideOptions}
           />
           

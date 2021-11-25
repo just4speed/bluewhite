@@ -4,8 +4,12 @@ import { Input, Text, Button } from 'react-native-elements';
 import {
     widthPercentageToDP as wp, heightPercentageToDP as hp
 } from "react-native-responsive-screen";
+import { useDispatch } from 'react-redux';
+// Utils
+import { request } from "../utils/request.js";
+import deviceStorage from '../utils/storage.js';
 
-const SignUp = () => {
+const SignUp = ({ navigation }) => {
     const [values, setValues] = React.useState({
         firstName: "",
         lastName: "",
@@ -14,6 +18,7 @@ const SignUp = () => {
         confirmPassword: ""
     });
     const [errors, setErrors] = React.useState([]);
+    const dispatch = useDispatch();
 
     const onChangeValue = ( key, value ) => {
         setValues({
@@ -47,13 +52,33 @@ const SignUp = () => {
         }
         if(formErrors.length === 0){
             setErrors([]);
-            dispatch({
-                type: "LOGIN",
-                payload: {
-                    mobile: "+78312384921"
+            request("/register", "POST", {
+                User:{
+                    FirstName: values.firstName,
+                    LastName: values.lastName,
+                    MobileNum: values.mobile,
+                    Password: values.password
                 }
-            });
-            navigation.navigate("ParkMe");
+            }).catch(e => {
+                console.warn(e.response)
+                if([400, 500].filter(c => c === e?.response?.status).length > 0){
+                    setErrors([
+                        {
+                            field: "mobile",
+                            message: e.response.data.message
+                        },
+                    ]);
+                }
+            }).then(result => {
+                if(result?.status === 200){
+                    dispatch({
+                        type: "LOGIN",
+                        payload: result.data
+                    })
+                    deviceStorage.login(result.data.user, result.data.token);
+                    navigation.navigate("Map");
+                }
+            })
         } else {
             setErrors(formErrors);
         }

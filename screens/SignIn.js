@@ -5,6 +5,9 @@ import { useDispatch } from 'react-redux';
 import {
     widthPercentageToDP as wp, heightPercentageToDP as hp
 } from "react-native-responsive-screen";
+// Utils
+import { request } from "../utils/request.js";
+import deviceStorage from '../utils/storage.js';
 
 const SignIn = ({ navigation }) => {
     const [values, setValues] = React.useState({
@@ -33,13 +36,34 @@ const SignIn = ({ navigation }) => {
         }
         if(formErrors.length === 0){
             setErrors([]);
-            dispatch({
-                type: "LOGIN",
-                payload: {
-                    mobile: "+78312384921"
+            request("/login", "POST", {
+                User:{
+                    MobileNum: values.mobile,
+                    Password: values.password
                 }
-            });
-            navigation.navigate("ParkMe");
+            }).catch(e => {
+                if(e?.response?.status === 400){
+                    setErrors([
+                        {
+                            field: "mobile",
+                            message: e.response.data.message
+                        },
+                        {
+                            field: "password",
+                            message: e.response.data.message
+                        }
+                    ]);
+                }
+            }).then(result => {
+                if(result?.status === 200){
+                    dispatch({
+                        type: "LOGIN",
+                        payload: result.data
+                    })
+                    deviceStorage.login(result.data.user, result.data.token);
+                    navigation.navigate("Map");
+                }
+            })
         } else {
             setErrors(formErrors);
         }

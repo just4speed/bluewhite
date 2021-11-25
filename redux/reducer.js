@@ -1,6 +1,7 @@
 const initialState = {
     data: null,
-    isAuthorized: true
+    token: "",
+    isAuthorized: false
 };
 
 export default function(state = initialState, action){
@@ -13,7 +14,8 @@ export default function(state = initialState, action){
         }
         case "LOGIN": {
             return{
-                data: action.payload,
+                data: action.payload.user,
+                token: action.payload.token,
                 isAuthorized: true
             }
         }
