@@ -3,15 +3,18 @@ import { SafeAreaView, View, TouchableOpacity, StyleSheet } from "react-native";
 import { Marker, Polyline } from 'react-native-maps';
 import MapView from 'react-native-maps';
 import { Chip, Button, Text } from 'react-native-elements';
-import axios from 'axios';
 import {
     widthPercentageToDP as wp, heightPercentageToDP as hp
 } from "react-native-responsive-screen";
+import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { useIsFocused } from '@react-navigation/native';
 
 const APP_ID = "rNAU3xdu7YhJWEJ6DnJp";
 const API_KEY = "7H7sYbMcmS1CyjtblgmXM50CXMQGHqQ5KDovjHON0Kg";
 
 const ParkMe = ({ navigation }) => {
+    const user = useSelector(state => state.user);
     const [mapMarkers, setMapMarkers] = React.useState([
         {
             latitude: "32.109333",
@@ -34,6 +37,10 @@ const ParkMe = ({ navigation }) => {
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
     });
+
+    const focused = useIsFocused();
+    //
+    const [lately, setLately] = React.useState(0);
 
     const getRoute = () => {
         // we are using parseFloat() because HERE API expects a float
@@ -66,8 +73,25 @@ const ParkMe = ({ navigation }) => {
     }
 
     React.useEffect(() => {
-        getRoute()
+        getRoute();
     }, []);
+
+    React.useEffect(() => {
+        axios.post("https://chance-app.herokuapp.com/chance-now-count", {
+            Address: {
+                CityId: 1
+            }
+        }, {
+            headers: {
+                "Authorization": `Bearer ${user.token}`
+            }
+        }).catch(e => {
+            console.warn("e", e.response)
+        }).then(result => {
+            console.warn("res", result.data);
+            setLately(result.data.data[0].count);
+        })
+    }, [focused]);
 
     return(
         <SafeAreaView>
@@ -97,7 +121,7 @@ const ParkMe = ({ navigation }) => {
             <View style={styles.chips}>
                 <View style={styles.chip}>
                     <Chip
-                        title="Lately parkings reported in your area - 5"
+                        title={`Lately parkings reported in your area - ${lately}`}
                     />
                 </View>
                 <View style={styles.chip}>

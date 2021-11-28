@@ -4,10 +4,28 @@ import { Chip, Button, Text, ButtonGroup } from 'react-native-elements';
 import {
     widthPercentageToDP as wp, heightPercentageToDP as hp
 } from "react-native-responsive-screen";
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const Submit = () => {
     const [sizeSelected, setSizeSelected] = React.useState(1);
-    const submit = () => {}
+    const user = useSelector(state => state.user);
+
+    const submit = () => {
+        axios.post("https://chance-app.herokuapp.com/chance", "POST", {
+            Address: {
+                Text: `מפנה בבוגרשוב ${Math.floor((Math.random()*300) + 1)} בעוד עשרים דקות`
+            },
+        }, {
+            headers: {
+                "Authorization": `Bearer ${user.token}`
+            }
+        }).catch(e => {
+            console.warn("e", e.response)
+        }).then(result => {
+            console.warn("res", result.data);
+        });
+    }
 
     const buttons = ['Small', 'Middle', 'Big']
 

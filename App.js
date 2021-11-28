@@ -56,12 +56,12 @@ function DrawerNavigator() {
 
   React.useEffect(() => {
     deviceStorage.init()
-    .then((data, token) => {
+    .then(data => {
       dispatch({
         type: "LOGIN",
         payload: {
-          user: data,
-          token
+          user: data.user,
+          token: data.token
         }
       });
     }).catch(e => {

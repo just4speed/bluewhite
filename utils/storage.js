@@ -10,8 +10,10 @@ const deviceStorage = {
                 reject();
             } else {
                 const user = JSON.parse(extingUserJson);
-                console.log(user)
-                resolve(user, extingUserToken);
+                resolve({
+                    user,
+                    token: extingUserToken
+                });
             }
         })
     },
@@ -21,6 +23,11 @@ const deviceStorage = {
     },
     async signout(){
         AsyncStorage.clear();
+    },
+    async getToken(){
+        return new Promise(async (resolve, reject) => {
+            const extingUserToken = await AsyncStorage.getItem("token");
+        })
     }
 }
 

@@ -4,7 +4,7 @@ const server = "https://chance-auth-server.herokuapp.com";
 
 const instance = axios.create({
     withCredentials: true,
-    baseURL: server
+    baseURL: server,
 })
 
 export const request = async (url, method = "GET", body = null) => {
