@@ -65,7 +65,7 @@ function DrawerNavigator() {
         }
       });
     }).catch(e => {
-      console.warn("noob")
+      //
     })
   }, []);
 
@@ -73,7 +73,7 @@ function DrawerNavigator() {
     <View style={styles.container}>
       <NavigationContainer>
         <Drawer.Navigator
-          initialRouteName={user.isAuthorized ? "ParkMe" : "Login"}
+          initialRouteName={"About"}
           drawerContent={props => <CustomDrawerContent {...props} />}
         >
 
@@ -92,7 +92,6 @@ function DrawerNavigator() {
           <Drawer.Screen
             name="About"
             component={About}
-            options={user.isAuthorized && hideOptions}
           />
 
           <Drawer.Screen
