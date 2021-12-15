@@ -5,13 +5,18 @@ import {
     widthPercentageToDP as wp, heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import axios from 'axios';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import deviceStorage from '../utils/storage';
 
-const Submit = () => {
-    const [sizeSelected, setSizeSelected] = React.useState(1);
+axios.defaults.withCredentials = true;
+
+const Submit = ({ navigation }) => {
     const user = useSelector(state => state.user);
+    const dispatch = useDispatch();
+
+    const [sizeSelected, setSizeSelected] = React.useState(1);
     const [items, setItems] = React.useState([
         {label: 'Street 1', value: 'str1'},
         {label: 'Street 2', value: 'str2'},
@@ -22,14 +27,30 @@ const Submit = () => {
     const [value, setValue] = React.useState(null);
     // Date picker
     const [date, setDate] = React.useState(new Date());
-    const [mode, setMode] = React.useState('date');
+    const [time, setTime] = React.useState(null);
+    const [mode, setMode] = React.useState("date");
     const [show, setShow] = React.useState(false);
+    // Building #
+    const [buildingNumber, setBuildingNumber] = React.useState(0);
 
     const onChange = (event, selectedDate) => {
         const currentDate = selectedDate || date;
-        setShow(false);
-        setDate(currentDate);
+
+        if(mode === "date"){
+            setDate(currentDate);
+            setMode("time");
+        } else {
+            setTime(currentDate);
+            console.warn(date)
+            console.warn(time)
+            setShow(false);
+        }
     };
+
+    const changeBuildingNumber = value => {
+        let buildingNo = Number(value);
+        setBuildingNumber(buildingNo);
+    }
 
     const showTimepicker = () => {
         showMode('time');
@@ -39,23 +60,55 @@ const Submit = () => {
         showMode('date');
     };
 
+    const getLocalDateTime = (date) => {
+        let hours = date.getHours();
+        if (hours < 10) hours = '0' + hours;
+      
+        let minutes = date.getMinutes();
+        if (minutes < 10) minutes = '0' + minutes;
+      
+        let timeOfDay = hours < 12 ? 'AM' : 'PM';
+      
+        return date.getMonth() + '/' + date.getDate() + '/' +
+               date.getFullYear() + ', ' + hours + ':' + minutes + " " + timeOfDay;
+    }
+
     const submit = () => {
-        axios.post("https://chance-app.herokuapp.com/chance", "POST", {
-            "Address": {
-                "CityId": 1,
-                "Text": `מפנה בבוגרשוב ${Math.floor((Math.random()*300) + 1)} בעוד חמש דקות`
+        const dateToSend = getLocalDateTime(new Date());
+        const requestBody = {
+            Address: {
+                CityId: 1,
+                CountryId: 367,
+                Text: `${buildingNumber} בוגרשוב`
             },
-            "Chance": {
-                "DateStart": "12/5/2021, 1:40:05 AM"
-            }
-        }, {
-            headers: {
-                "Authorization": `Bearer ${user.token}`
-            }
-        }).catch(e => {
-            console.warn("e", e.response)
+            Chance: {
+                DateStart: dateToSend
+            },
+            Driver: {
+                MobileNum: "0544123123"
+            },
+            WhatsApp: {
+                GroupName: "react native app"
+            },
+        };
+        const requestHeaders = {
+            'Authorization': `Bearer ${user.token}`,
+            'Content-Type': 'application/json',
+            'Referer': 'http://www.bluewhite.space/',
+            'Origin': 'http://www.bluewhite.space',
+            // mode: "no-cors"
+        }
+        axios.post("http://chance-app.herokuapp.com/chance", "POST", requestBody, requestHeaders)
+        .catch(e => {
+            // if(e.response.status === 503){
+            //     deviceStorage.signout();
+            //     dispatch({ type: "LOG_OUT" });
+            //     navigation.navigate("Login");
+            // }
+            console.warn(e.response);
         }).then(result => {
             console.warn("res", result.data);
+            // navigation.navigate("ParkMe");
         });
     }
 
@@ -84,6 +137,10 @@ const Submit = () => {
                                 is24Hour={true}
                                 display="default"
                                 onChange={onChange}
+                                dropDownStyle={{
+                                    backgroundColor: 'white',
+                                }}
+                                containerStyle={{ height: 40 }}
                             />
                         )}
                         <Button title="Now!"/>
@@ -100,8 +157,8 @@ const Submit = () => {
                             placeholder={"Select Street"}
                             setValue={setValue}
                             setItems={setItems}
-                            style={{ borderWidth: 0 }}
-                            dropDownContainerStyle={{ borderWidth: 0 }}
+                            style={{ borderWidth: 0, backgroundColor: "#fff" }}
+                            dropDownContainerStyle={{ borderWidth: 0, backgroundColor: "#fff" }}
                         />
                     </View>
                 </View>
@@ -112,6 +169,7 @@ const Submit = () => {
                         value={55}
                         style={styles.input}
                         keyboardType="phone-pad"
+                        onChangeText={changeBuildingNumber}
                     />
                 </View>
                 <View style={{ ...styles.fieldContainer, flexDirection: "column", alignItems: "flex-start" }}>

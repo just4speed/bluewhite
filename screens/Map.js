@@ -3,15 +3,20 @@ import { SafeAreaView, View, TouchableOpacity, StyleSheet } from "react-native";
 import { Marker } from 'react-native-maps';
 import MapView from 'react-native-maps';
 import { ButtonGroup, Text } from 'react-native-elements';
+import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import {
     widthPercentageToDP as wp, heightPercentageToDP as hp
 } from "react-native-responsive-screen";
+import deviceStorage from '../utils/storage';
 
 const APP_ID = "rNAU3xdu7YhJWEJ6DnJp";
 const API_KEY = "7H7sYbMcmS1CyjtblgmXM50CXMQGHqQ5KDovjHON0Kg";
 
 const Map = ({ navigation }) => {
+    const user = useSelector(state => state.user);
+    const dispatch = useDispatch();
+
     const [selectedIndex, setSelectedIndex] = React.useState(1);
     const [startingLocation, setStartingLocation] = React.useState({
         latitude: "37.025",
@@ -57,8 +62,36 @@ const Map = ({ navigation }) => {
     }
 
     React.useEffect(() => {
-        getRoute()
+        const requestBody = {
+            Address: {
+                CityId: 1,
+            },
+            Chance: {
+                DateStart: "12/7/2021, 4:22:33 PM"
+            }
+        };
+        const requestHeaders = {
+            "Authorization": "Bearer" + user.token,
+            'Referer': 'http://www.bluewhite.space/',
+            'Origin': 'http://www.bluewhite.space'
+        };
+        axios.post("http://chance-app.herokuapp.com/chance-list", "POST", requestBody, requestHeaders)
+        .catch(e => {
+            // if(e.response.status === 503){
+            //     deviceStorage.signout();
+            //     dispatch({ type: "LOG_OUT" });
+            //     navigation.navigate("Login");
+            // }
+            console.warn(e.response)
+        }).then(result => {
+            console.warn("res", result.data);
+        });
+        getRoute();
     }, []);
+
+    const changeButton = index => {
+        setSelectedIndex(index);
+    }
 
     const buttons = [5, 15, 45]
 
@@ -86,7 +119,7 @@ const Map = ({ navigation }) => {
             ) }
             <ButtonGroup
                 selectedIndex={selectedIndex}
-                onPress={(index) => setSelectedIndex(index)}
+                onPress={(index) => changeButton(index)}
                 buttons={buttons}
                 containerStyle={styles.buttonItem}
                 selectedTextStyle={{ color: "white", fontWeight: "bold" }}

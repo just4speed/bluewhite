@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, View, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { SafeAreaView, View, ScrollView, Platform, KeyboardAvoidingView, TouchableOpacity, StyleSheet } from "react-native";
 import { Input, Text, Button } from 'react-native-elements';
 import {
     widthPercentageToDP as wp, heightPercentageToDP as hp
@@ -86,63 +86,67 @@ const SignUp = ({ navigation }) => {
 
     return(
         <SafeAreaView>
-            <ScrollView vertical contentContainerStyle={{ paddingHorizontal: wp("10%"), paddingVertical: hp("5%") }}>
-                <Text h4 style={styles.title}>Create a new account</Text>
-                <Input
-                    placeholder={"John"}
-                    leftIcon={{ type: 'font-awesome', name: 'user-circle', color: "#2288DC" }}
-                    leftIconContainerStyle={{ marginRight: wp("2%") }}
-                    label={"First Name"}
-                    containerStyle={styles.inputContainer}
-                    onChangeText={value => onChangeValue("firstName", value)}
-                    errorStyle={styles.errorMessage}
-                    errorMessage={errors.filter(e => e.field === "firstName").length > 0 && errors.filter(e => e.field === "firstName")[0].message}
-                />
-                <Input
-                    placeholder={"Doe"}
-                    leftIcon={{ type: 'font-awesome', name: 'user-circle', color: "#2288DC" }}
-                    leftIconContainerStyle={{ marginRight: wp("2%") }}
-                    label={"Last Name"}
-                    containerStyle={styles.inputContainer}
-                    onChangeText={value => onChangeValue("lastName", value)}
-                    errorStyle={styles.errorMessage}
-                    errorMessage={errors.filter(e => e.field === "lastName").length > 0 && errors.filter(e => e.field === "lastName")[0].message}
-                />
-                <Input
-                    keyboardType={"phone-pad"}
-                    placeholder={"+1 (234) 56-78"}
-                    leftIcon={{ type: 'font-awesome', name: 'mobile', color: "#2288DC" }}
-                    leftIconContainerStyle={{ marginRight: wp("2%") }}
-                    label={"Mobile Number"}
-                    containerStyle={styles.inputContainer}
-                    onChangeText={value => onChangeValue("mobile", value)}
-                    errorStyle={styles.errorMessage}
-                    errorMessage={errors.filter(e => e.field === "mobile").length > 0 && errors.filter(e => e.field === "mobile")[0].message}
-                />
-                <Input
-                    placeholder="******"
-                    leftIcon={{ type: 'font-awesome', name: 'lock', color: "#2288DC" }}
-                    leftIconContainerStyle={{ marginRight: wp("2%") }}
-                    secureTextEntry={true}
-                    label={"Password"}
-                    containerStyle={styles.inputContainer}
-                    onChangeText={value => onChangeValue("password", value)}
-                    errorStyle={styles.errorMessage}
-                    errorMessage={errors.filter(e => e.field === "password").length > 0 && errors.filter(e => e.field === "password")[0].message}
-                />
-                <Input
-                    placeholder="******"
-                    leftIcon={{ type: 'font-awesome', name: 'lock', color: "#2288DC" }}
-                    leftIconContainerStyle={{ marginRight: wp("2%") }}
-                    secureTextEntry={true}
-                    label={"Confirm Password"}
-                    containerStyle={styles.inputContainer}
-                    onChangeText={value => onChangeValue("confirmPassword", value)}
-                    errorStyle={styles.errorMessage}
-                    errorMessage={errors.filter(e => e.field === "confirmPassword").length > 0 && errors.filter(e => e.field === "confirmPassword")[0].message}
-                />
-                <Button onPress={onSignUp} title="Sign Up"/>
-            </ScrollView>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+            >
+                <ScrollView vertical contentContainerStyle={{ paddingHorizontal: wp("10%"), paddingVertical: hp("5%") }}>
+                    <Text h4 style={styles.title}>Create a new account</Text>
+                    <Input
+                        placeholder={"John"}
+                        leftIcon={{ type: 'font-awesome', name: 'user-circle', color: "#2288DC" }}
+                        leftIconContainerStyle={{ marginRight: wp("2%") }}
+                        label={"First Name"}
+                        containerStyle={styles.inputContainer}
+                        onChangeText={value => onChangeValue("firstName", value)}
+                        errorStyle={styles.errorMessage}
+                        errorMessage={errors.filter(e => e.field === "firstName").length > 0 && errors.filter(e => e.field === "firstName")[0].message}
+                    />
+                    <Input
+                        placeholder={"Doe"}
+                        leftIcon={{ type: 'font-awesome', name: 'user-circle', color: "#2288DC" }}
+                        leftIconContainerStyle={{ marginRight: wp("2%") }}
+                        label={"Last Name"}
+                        containerStyle={styles.inputContainer}
+                        onChangeText={value => onChangeValue("lastName", value)}
+                        errorStyle={styles.errorMessage}
+                        errorMessage={errors.filter(e => e.field === "lastName").length > 0 && errors.filter(e => e.field === "lastName")[0].message}
+                    />
+                    <Input
+                        keyboardType={"phone-pad"}
+                        placeholder={"+1 (234) 56-78"}
+                        leftIcon={{ type: 'font-awesome', name: 'mobile', color: "#2288DC" }}
+                        leftIconContainerStyle={{ marginRight: wp("2%") }}
+                        label={"Mobile Number"}
+                        containerStyle={styles.inputContainer}
+                        onChangeText={value => onChangeValue("mobile", value)}
+                        errorStyle={styles.errorMessage}
+                        errorMessage={errors.filter(e => e.field === "mobile").length > 0 && errors.filter(e => e.field === "mobile")[0].message}
+                    />
+                    <Input
+                        placeholder="******"
+                        leftIcon={{ type: 'font-awesome', name: 'lock', color: "#2288DC" }}
+                        leftIconContainerStyle={{ marginRight: wp("2%") }}
+                        secureTextEntry={true}
+                        label={"Password"}
+                        containerStyle={styles.inputContainer}
+                        onChangeText={value => onChangeValue("password", value)}
+                        errorStyle={styles.errorMessage}
+                        errorMessage={errors.filter(e => e.field === "password").length > 0 && errors.filter(e => e.field === "password")[0].message}
+                    />
+                    <Input
+                        placeholder="******"
+                        leftIcon={{ type: 'font-awesome', name: 'lock', color: "#2288DC" }}
+                        leftIconContainerStyle={{ marginRight: wp("2%") }}
+                        secureTextEntry={true}
+                        label={"Confirm Password"}
+                        containerStyle={styles.inputContainer}
+                        onChangeText={value => onChangeValue("confirmPassword", value)}
+                        errorStyle={styles.errorMessage}
+                        errorMessage={errors.filter(e => e.field === "confirmPassword").length > 0 && errors.filter(e => e.field === "confirmPassword")[0].message}
+                    />
+                    <Button onPress={onSignUp} title="Sign Up"/>
+                </ScrollView>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     )
 }

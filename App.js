@@ -73,7 +73,7 @@ function DrawerNavigator() {
     <View style={styles.container}>
       <NavigationContainer>
         <Drawer.Navigator
-          initialRouteName={"About"}
+          initialRouteName={"ParkMe"}
           drawerContent={props => <CustomDrawerContent {...props} />}
         >
 

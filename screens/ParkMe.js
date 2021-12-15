@@ -7,14 +7,17 @@ import {
     widthPercentageToDP as wp, heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import axios from 'axios';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useIsFocused } from '@react-navigation/native';
+import deviceStorage from '../utils/storage';
 
 const APP_ID = "rNAU3xdu7YhJWEJ6DnJp";
 const API_KEY = "7H7sYbMcmS1CyjtblgmXM50CXMQGHqQ5KDovjHON0Kg";
 
 const ParkMe = ({ navigation }) => {
     const user = useSelector(state => state.user);
+    const dispatch = useDispatch();
+    
     const [mapMarkers, setMapMarkers] = React.useState([
         {
             latitude: "32.109333",
@@ -69,7 +72,11 @@ const ParkMe = ({ navigation }) => {
     }
 
     const parkMe = () => {
-        navigation.navigate("Map");
+        if(user.isAuthorized){
+            navigation.navigate("Map");
+        } else {
+            navigation.navigate("Login");
+        }
     }
 
     React.useEffect(() => {
@@ -77,16 +84,23 @@ const ParkMe = ({ navigation }) => {
     }, []);
 
     React.useEffect(() => {
-        axios.post("https://chance-app.herokuapp.com/chance-now-count", {
+        axios.post("http://chance-app.herokuapp.com/chance-today-count", {
             Address: {
                 CityId: 1
             }
         }, {
             headers: {
-                "Authorization": `Bearer ${user.token}`
+                "Authorization": `Bearer ${user.token}`,
+                'Referer': 'http://www.bluewhite.space/',
+                'Origin': 'http://www.bluewhite.space'
             }
         }).catch(e => {
-            console.warn("e", e.response)
+            // if(e.response.status === 503){
+            //     deviceStorage.signout();
+            //     dispatch({ type: "LOG_OUT" });
+            //     navigation.navigate("Login");
+            // }
+            console.warn(e.response)
         }).then(result => {
             console.warn("res", result.data);
             setLately(result.data.data[0].count);
